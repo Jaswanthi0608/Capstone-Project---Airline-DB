@@ -1,0 +1,150 @@
+
+-- Airline DB Link: https://drive.google.com/file/d/15ehp3FtyuYqExne3FaFcWHB4TFI_vtSR/view?usp=sharing
+
+QUESTION 1:
+Find list of airport codes in Europe/Moscow timezone.
+Sol: select airport_code
+from airports
+where timezone = 'Europe/Moscow';
+
+QUESTION 2:
+Write a query to get the count of seats in various fare condition for every aircraft code?
+Sol: select aircraft_code, fare_conditions, count(seat_no) as no_of_seats  
+from seats
+group by  aircraft_code, fare_conditions
+order by aircraft_code asc;
+
+QUESTION 3:
+How many aircrafts codes have at least one Business class seats?
+Sol: select  fare_conditions,  count(aircraft_code)   
+from seats
+where  fare_conditions = 'Business'
+group by fare_conditions;
+
+QUESTION 4:
+Find out the name of the airport having maximum number of departure flight?
+Sol: select airport_name, count(departure_airport) 
+from flights
+join airports on flights.departure_airport = airports.airport_code
+group by departure_airport, airport_name
+order by count(departure_airport) desc
+LIMIT 1;
+
+QUESTION 5:
+Find out the name of the airport having least number of scheduled departure flights?
+Sol: select airport_name, count(scheduled_departure) 
+from flights
+join airports on flights.departure_airport = airports.airport_code
+group by departure_airport, airport_name
+order by count(scheduled_departure) asc
+limit 1;
+
+QUESTION 6:
+How many flights from ‘DME’ airport don’t have actual departure?
+Sol: select departure_airport, count(departure_airport) 
+from flights
+where departure_airport = 'DME' and actual_departure is NULL
+group by departure_airport;
+
+QUESTION 7:
+Identify flight ids having range between 3000 to 6000?
+Sol: select flight_id  
+from flights
+join aircrafts on flights.aircraft_code = aircrafts.aircraft_code
+where range between 3000 and 6000;
+
+QUESTION 8:
+Write a query to get the count of flights flying between URS and KUF?
+Sol: select  count(flight_id) 
+from flights
+where departure_airport IN ('URS', 'KUF') and arrival_airport IN ('URS', 'KUF');
+
+QUESTION 9:
+Write a query to get the count of flights flying from either from NOZ or KRR?
+Sol: select  count(flight_id) 
+from flights
+where departure_airport = 'NOZ' or departure_airport = 'KRR';
+
+QUESTION 10:
+Write a query to get the count of flights flying from KZN, DME, NBC,NJC,GDX,SGC,VKO,ROV
+Sol: select count(flight_id) 
+from flights
+where departure_airport in ('KZN', 'DME', 'NBC', 'NJC','GDX' ,'SGC', 'VKO', 'ROV');
+
+QUESTION 11:
+Write a query to extract flight details having range between 3000 and 6000 and flying from DME
+Sol: select flights.flight_id,  flights.flight_no, flights.departure_airport, flights.arrival_airport
+from flights
+join aircrafts on flights.aircraft_code = aircrafts.aircraft_code
+where range between 3000 and 6000 and departure_airport = 'DME'; 
+
+QUESTION 12:
+Find the list of flight ids which are using aircrafts from “Airbus” company and got cancelled or delayed
+Sol: select  flight_id, status 
+from flights
+join aircrafts on flights.aircraft_code = aircrafts.aircraft_code
+Where model like '%Air%' and 
+status in ('Cancelled', 'Delayed');
+
+QUESTION 13:
+Find the list of flight ids which are using aircrafts from “Boeing” company and got cancelled or delayed
+Sol: select  flight_id, status 
+from flights
+join aircrafts on flights.aircraft_code = aircrafts.aircraft_code
+Where model like '%Boeing%' 
+and status in ('Cancelled', 'Delayed');
+
+QUESTION 14:
+Which airport(name) has most cancelled flights (arriving)?
+Sol: select airport_name, count(status) 
+from flights
+join airports on flights.departure_airport = airports.airport_code
+where status = 'Cancelled'
+group by airport_name 
+order by count(status) desc
+limit 1;
+
+QUESTION 15:
+Identify flight ids which are using “Airbus aircrafts”.
+Sol: select  flight_id from flights
+join aircrafts on flights.aircraft_code = aircrafts.aircraft_code
+where model like '%Airbus%';
+
+QUESTION 16:
+Identify date-wise last flight id flying from every airport?
+Sol: select   max(scheduled_departure) scheduled_departure_date_and_time, flight_id 
+from flights
+group by flight_id	
+order by scheduled_departure_date_and_time desc;
+
+QUESTION 17:
+Identify list of customers who will get the refund due to cancellation of the flights? And how much amount they will get?
+Sol: select  tickets.passenger_name, ticket_flights.amount, flights.status 
+from tickets
+join ticket_flights on tickets.ticket_no = ticket_flights.ticket_no
+join flights on  flights.flight_id = ticket_flights.flight_id 
+where flights.status = 'Cancelled'
+group by tickets.passenger_name, ticket_flights.amount, flights.status
+order by flights.status desc
+
+QUESTION 18:
+Identify date wise first cancelled flight id flying for every airport?
+Sol:  select   min(scheduled_departure) , scheduled_departure_date_and_time, flight_id 
+from flights
+group by flight_id;
+
+QUESTION 19:
+Identify list of Airbus flight ids which got cancelled.
+Sol: select  flight_id 
+from flights
+join aircrafts on flights.aircraft_code = aircrafts.aircraft_code
+where model like '%Airbus%' and status = ‘Cancelled’;
+
+QUESTION 20:
+Identify list of flight ids having highest range?
+Sol: select  flight_id, range 
+from flights
+join aircrafts on flights.aircraft_code = aircrafts.aircraft_code
+group by flight_id, range
+order by range desc
+limit 1;
